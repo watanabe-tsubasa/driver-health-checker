@@ -49,7 +49,7 @@ export default function StoreSearchCombobox() {
             value={value
               ? stores.find((store) => store.value === value)?.label
               : ""}
-            // <ChevronsUpDown className="opacity-50" />
+            onChange={() => {return}}
             placeholder="店名を入力"
           >
           </Input>
