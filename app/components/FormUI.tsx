@@ -28,7 +28,7 @@ const stores = [
   },
 ]
 
-export default function StoreSearchCombobox() {
+export const StoreSearchCombobox = () => {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
 

@@ -54,7 +54,7 @@ export default function App() {
         <div className="flex flex-1 overflow-hidden">
           <CustomSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
           <div className="flex-1 overflow-auto md:ml-64">
-          <main className="h-[calc(100vh-theme(height.16))] w-full max-w-full overflow-hidden">
+          <main className="h-screen-header w-full max-w-full overflow-hidden">
             <Outlet />
           </main>
           </div>

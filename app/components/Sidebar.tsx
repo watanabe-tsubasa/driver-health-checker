@@ -8,9 +8,9 @@ import {
 } from '~/components/ui/sheet';
 
 const menuItems = [
-  { name: "Home", href: "/" },
-  { name: "Dashboard", href: "/dashboard" },
-  { name: "Projects", href: "/projects" },
+  { name: "配送前登録", href: "/" },
+  { name: "帰着後登録", href: "/projects" },
+  { name: "管理者ログイン", href: "/login" },
   { name: "Tasks", href: "/tasks" },
   { name: "Reports", href: "/reports" },
 ];
@@ -37,7 +37,7 @@ const SidebarContent = () => (
       </div>
     </nav>
     <div className="p-4 border-t">
-      <p className="text-sm text-muted-foreground">© 2024 Your Company</p>
+      <p className="text-sm text-muted-foreground">© 2024 イオンリテール</p>
     </div>
   </div>
 );
@@ -59,11 +59,14 @@ export function CustomSidebar({ open, onOpenChange }: CustomSidebarProps) {
 
       {/* Mobile Drawer */}
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent side="left" className="h-screen w-64 p-0 flex flex-col">
           <SheetHeader className="px-4 py-2 border-b">
             <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
+          <div className='flex-1'>
           <SidebarContent />
+
+          </div>
         </SheetContent>
       </Sheet>
     </>
