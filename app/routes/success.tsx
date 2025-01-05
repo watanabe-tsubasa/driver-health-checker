@@ -1,9 +1,9 @@
 import { Card } from "~/components/ui/card";
 
-export default function Manager() {
+export default function Success() {
   return (
     <Card>
-      Manager
+      success
     </Card>
   )
 }

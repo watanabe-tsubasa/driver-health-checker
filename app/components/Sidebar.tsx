@@ -8,7 +8,7 @@ import {
 } from '~/components/ui/sheet';
 
 const menuItems = [
-  { name: "配送前登録", href: "/" },
+  { name: "配送前登録", href: "/driver" },
   { name: "帰着後登録", href: "/projects" },
   { name: "管理者ログイン", href: "/login" },
   { name: "Tasks", href: "/tasks" },

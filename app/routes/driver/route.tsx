@@ -1,10 +1,10 @@
-import { json, redirect } from '@remix-run/node';
-import { useActionData, Form } from '@remix-run/react';
-import { StoreSearchCombobox } from './FormUI';
+import { redirect } from '@remix-run/node';
+import { useActionData, Form, Outlet } from '@remix-run/react';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Button } from '~/components/ui/button';
 import { Switch } from '~/components/ui/switch';
+import { StoreSearchCombobox } from '~/components/FormUI';
 
 export async function action({ request }) {
   const formData = await request.formData();
@@ -17,7 +17,7 @@ export async function action({ request }) {
   const sleepHours = parseFloat(formData.get('sleepHours') || '0');
 
   if (!driverName || !deliveryCompany || isNaN(alcoholTestResult) || isNaN(sleepHours)) {
-    return json({ error: '必須項目をすべて入力してください。' }, { status: 400 });
+    return Response.json({ error: '必須項目をすべて入力してください。' }, { status: 400 });
   }
 
   // フォームデータをサーバー側で処理するロジックをここに追加
@@ -38,22 +38,18 @@ export default function DriverHealthCheckForm() {
   const actionData = useActionData();
 
   return (
-    <Form method="post" className="space-y-8 max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+    <Form method="post" className="space-y-4 max-w-md mx-auto p-6 bg-white rounded-lg shadow-md min-h-screen-header">
       {actionData?.error && (
         <div className="text-red-500 text-sm">{actionData.error}</div>
       )}
+      <StoreSearchCombobox />
 
-      <div className="space-y-3">
-        <Label htmlFor="store">店舗名</Label>
-        <StoreSearchCombobox />
-      </div>
-
-      <div className="space-y-3">
-        <Label htmlFor="driverName">指名</Label>
+      <div className='space-y-2'>
+        <Label htmlFor="driverName">氏名</Label>
         <Input id="driverName" name="driverName" required />
       </div>
 
-      <div className="space-y-3">
+      <div className='space-y-2'>
         <Label htmlFor="deliveryCompany">配送会社</Label>
         <Input id="deliveryCompany" name="deliveryCompany" required />
       </div>
@@ -65,9 +61,9 @@ export default function DriverHealthCheckForm() {
         <Switch id="hasConsumedAlcohol" name="hasConsumedAlcohol" />
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <Label htmlFor="alcoholTestResult">アルコール測定の結果</Label>
-        <Input id="alcoholTestResult" name="alcoholTestResult" type="number" step="0.01" required />
+        <Input id="alcoholTestResult" name="alcoholTestResult" type="number" step="0.1" required />
       </div>
 
       <div className="flex items-center justify-between">
@@ -76,13 +72,12 @@ export default function DriverHealthCheckForm() {
         </Label>
         <Switch id="hasIllness" name="hasIllness" />
       </div>
-
-      <div className="space-y-3">
+      <div className='space-y-2'>
         <Label htmlFor="sleepHours">睡眠時間</Label>
         <Input id="sleepHours" name="sleepHours" type="number" step="0.5" required />
       </div>
-
       <Button type="submit" className="w-full">送信</Button>
+      <Outlet />
     </Form>
   );
 }

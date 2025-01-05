@@ -26,6 +26,30 @@ const stores = [
     value: "イオン船橋店",
     label: "イオン船橋店",
   },
+  {
+    value: "イオンスタイル幕張新都心",
+    label: "イオンスタイル幕張新都心",
+  },
+  {
+    value: "イオン海浜幕張店",
+    label: "イオン海浜幕張店",
+  },
+  {
+    value: "イオンスタイル品川シーサイド",
+    label: "イオンスタイル品川シーサイド",
+  },
+  {
+    value: "イオンスタイル金剛",
+    label: "イオンスタイル金剛",
+  },
+  {
+    value: "イオン鎌ケ谷店",
+    label: "イオン鎌ケ谷店",
+  },
+  {
+    value: "イオンスタイル甲府昭和",
+    label: "イオンスタイル甲府昭和",
+  },
 ]
 
 export const StoreSearchCombobox = () => {
@@ -33,7 +57,7 @@ export const StoreSearchCombobox = () => {
   const [value, setValue] = React.useState("")
 
   return (
-    <>
+    <div className="space-y-2">
       <label
        htmlFor="storeName"
        className="block text-sm font-medium text-gray-700"
@@ -83,6 +107,6 @@ export const StoreSearchCombobox = () => {
           </Command>
         </PopoverContent>
       </Popover>
-    </>
+    </div>
   )
 }
