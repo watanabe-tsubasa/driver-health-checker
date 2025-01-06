@@ -67,6 +67,8 @@ export const StoreSearchCombobox = () => {
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Input
+            id="storeName"
+            name="storeName"
             type="text"
             role="combobox"
             aria-expanded={open}
@@ -75,6 +77,7 @@ export const StoreSearchCombobox = () => {
               : ""}
             onChange={() => {return}}
             placeholder="店名を入力"
+            required
           >
           </Input>
         </PopoverTrigger>

@@ -5,7 +5,7 @@ import { Card } from "~/components/ui/card";
 export default function Index() {
   return (
     <Card className="h-screen-header flex justify-center items-center">
-      <Link to='/driver'>
+      <Link to='/driver/start'>
         <Button>
           体調を登録する
         </Button>

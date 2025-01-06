@@ -8,8 +8,8 @@ import {
 } from '~/components/ui/sheet';
 
 const menuItems = [
-  { name: "配送前登録", href: "/driver" },
-  { name: "帰着後登録", href: "/projects" },
+  { name: "配送前登録", href: "/driver/start" },
+  { name: "帰着後登録", href: "/driver/end" },
   { name: "管理者ログイン", href: "/login" },
   { name: "Tasks", href: "/tasks" },
   { name: "Reports", href: "/reports" },
