@@ -1,4 +1,4 @@
-import { redirect } from '@remix-run/node';
+import { redirect } from '@remix-run/cloudflare';
 import { useActionData, Form } from '@remix-run/react';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
