@@ -1,26 +1,24 @@
 import { redirect } from '@remix-run/cloudflare';
-import { useActionData, Form } from '@remix-run/react';
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
-import { Button } from '~/components/ui/button';
-import { Switch } from '~/components/ui/switch';
-import { StoreSearchCombobox } from '~/components/FormUI';
+import { useLoaderData, Form } from "@remix-run/react";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Button } from "~/components/ui/button";
+import { Switch } from "~/components/ui/switch";
+import { DriverActionRequest } from './driver.start';
 
-export interface DriverHealthCheckFormData {
-  storeName: string; // 店舗名
-  driverName: string; // 氏名
-  deliveryCompany: string; // 配送会社
-  hasUsedAlcoholChecker: boolean; // チェッカー使用の有無
-  alcoholTestFirstResult: number; // アルコール測定結果1回目
-  alcoholTestSecondResult: number | null; // アルコール測定結果2回目
-  hasIllness: boolean; // 疾病の有無
-  isTired: number; // 疲労の有無
-}
+type LoaderData = {
+  storeName: string;
+  driverName: string;
+  deliveryCompany: string;
+};
 
-export interface DriverActionRequest {
-  request: {
-    formData: () => Promise<FormData>;
-  };
+export async function loader({ request }: { request: Request }) {
+  const url = new URL(request.url);
+  const storeName = url.searchParams.get("storeName") || "";
+  const driverName = url.searchParams.get("driverName") || "";
+  const deliveryCompany = url.searchParams.get("deliveryCompany") || "";
+
+  return Response.json({ storeName, driverName, deliveryCompany });
 }
 
 export async function action({ request }: DriverActionRequest) {
@@ -62,28 +60,24 @@ export async function action({ request }: DriverActionRequest) {
   return redirect('/success');
 }
 
-export interface DriverActionData {
-  error?: string;
-}
-
 export default function DriverHealthCheckForm() {
-  const actionData = useActionData<DriverActionData>();
+  const { storeName, driverName, deliveryCompany } = useLoaderData<LoaderData>();
 
   return (
-    <Form method="post" className="space-y-4 max-w-md mx-auto p-6 bg-white rounded-lg shadow-md min-h-screen-header">
-      {actionData?.error && (
-        <div className="text-red-500 text-sm">{actionData.error}</div>
-      )}
-      <StoreSearchCombobox />
-
-      <div className='space-y-2'>
-        <Label htmlFor="driverName">氏名</Label>
-        <Input id="driverName" name="driverName" required />
+    <Form method="post" className="space-y-4 p-6 bg-white rounded-lg shadow-md">
+      <div className="space-y-2">
+        <Label htmlFor="storeName">店舗名</Label>
+        <Input id="storeName" name="storeName" required defaultValue={storeName} readOnly />
       </div>
 
-      <div className='space-y-2'>
+      <div className="space-y-2">
+        <Label htmlFor="driverName">氏名</Label>
+        <Input id="driverName" name="driverName" required defaultValue={driverName} readOnly />
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="deliveryCompany">配送会社</Label>
-        <Input id="deliveryCompany" name="deliveryCompany" required />
+        <Input id="deliveryCompany" name="deliveryCompany" required defaultValue={deliveryCompany} readOnly />
       </div>
 
       <div className="flex items-center justify-between pt-2">

@@ -9,7 +9,7 @@ import {
 
 const menuItems = [
   { name: "配送前登録", href: "/driver/start" },
-  { name: "帰着後登録", href: "/driver/end" },
+  { name: "帰着後登録", href: "/driver/end/store-select" },
   { name: "管理者ログイン", href: "/login" },
   { name: "Tasks", href: "/tasks" },
   { name: "Reports", href: "/reports" },
