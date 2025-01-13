@@ -36,7 +36,7 @@ const storeData: StoreData[] = [
 ];
 
 // Loader関数
-export async function loader({ request }: { request: Request }) {
+export const loader = async ({ request }: { request: Request }) => {
   const url = new URL(request.url);
   const storeName = url.searchParams.get("storeName");
 

@@ -1,6 +1,7 @@
 import { Link } from '@remix-run/react';
 import { Menu } from 'lucide-react';
 import { Button } from '~/components/ui/button';
+import { LogoutButton } from './FunctionalComponents';
 
 interface HeaderProps {
   onOpenSidebar: () => void;
@@ -16,11 +17,18 @@ export function Header({ onOpenSidebar }: HeaderProps) {
             <span className="sr-only">Toggle Sidebar</span>
           </Button>
           <Link to="/" className="flex items-center space-x-2">
-            <span className="inline-block font-bold">Your Logo</span>
+            <span className="inline-block font-bold">ドライバー体調管理</span>
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          {/* Add any additional header items here, e.g., user profile, notifications */}
+          <LogoutButton
+            isLoggedIn={true}
+            user={{
+              lastName: "渡邊",
+              firstName: "翼",
+              storeName: "イオン東雲店",
+            }}
+          />
         </div>
       </div>
     </header>

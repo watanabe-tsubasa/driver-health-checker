@@ -23,7 +23,7 @@ export interface DriverActionRequest {
   };
 }
 
-export async function action({ request }: DriverActionRequest) {
+export const action = async({ request }: DriverActionRequest) => {
   const formData = await request.formData();
 
   const storeName = formData.get('storeName');

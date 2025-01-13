@@ -12,7 +12,7 @@ type LoaderData = {
   deliveryCompany: string;
 };
 
-export async function loader({ request }: { request: Request }) {
+export const loader = async ({ request }: { request: Request }) => {
   const url = new URL(request.url);
   const storeName = url.searchParams.get("storeName") || "";
   const driverName = url.searchParams.get("driverName") || "";
@@ -21,7 +21,7 @@ export async function loader({ request }: { request: Request }) {
   return Response.json({ storeName, driverName, deliveryCompany });
 }
 
-export async function action({ request }: DriverActionRequest) {
+export const action = async ({ request }: DriverActionRequest) => {
   const formData = await request.formData();
 
   const storeName = formData.get('storeName');

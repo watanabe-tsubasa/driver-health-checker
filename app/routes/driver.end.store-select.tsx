@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { StoreSearchCombobox } from "~/components/FormUI";
 import { Separator } from "~/components/ui/separator";
 
-export async function action({ request }: { request: Request }) {
+export const action = async ({ request }: { request: Request }) => {
   const formData = await request.formData();
   const storeName = formData.get("storeName")?.toString();
 
