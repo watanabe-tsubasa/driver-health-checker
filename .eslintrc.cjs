@@ -7,6 +7,9 @@
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
   root: true,
+  rules: {
+    "react/prop-types": "off"
+  },
   parserOptions: {
     ecmaVersion: "latest",
     sourceType: "module",

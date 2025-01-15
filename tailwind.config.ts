@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+      },
       height: {
         'screen-header': 'calc(100vh - theme(height.16))', // header幅を考慮して画面いっぱいにする
       },

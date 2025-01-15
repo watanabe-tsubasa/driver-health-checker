@@ -14,7 +14,7 @@ export interface DriverHealthCheckFormData {
   alcoholTestFirstResult: number; // アルコール測定結果1回目
   alcoholTestSecondResult: number | null; // アルコール測定結果2回目
   hasIllness: boolean; // 疾病の有無
-  isTired: number; // 疲労の有無
+  isTired: boolean; // 疲労の有無
 }
 
 export interface DriverActionRequest {
@@ -123,12 +123,12 @@ export default function DriverHealthCheckForm() {
       </div>
 
       <div className="flex items-center justify-between py-2">
-        <Label htmlFor="hasIllness" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+        <Label htmlFor="isTired" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           疲労の有無
         </Label>
         <div className='flex flex-row items-center justify-center space-x-2'>
           <p className='text-xs'>無</p>
-          <Switch id="hasIllness" name="hasIllness" />
+          <Switch id="isTired" name="isTired" />
           <p className='text-xs'>有</p>
         </div>
       </div>
