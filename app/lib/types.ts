@@ -22,3 +22,10 @@ export interface LoaderData {
   loginData: LoginData;
   filteredData: DriverLog[];
 }
+
+export interface DataTypeForLogin {
+  lastName: string;
+  password: string;
+  firstName?: string;
+  storeName?: string;
+}

@@ -1,48 +1,40 @@
-import { redirect } from "@remix-run/cloudflare";
+import { ActionFunctionArgs, redirect } from "@remix-run/cloudflare";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "~/components/ui/card";
+import { DataTypeForLogin } from "~/lib/types";
+import { LoginResponseType } from "api/auth/login";
 
-
-
-const SAMPLE_USERS = [
-  {
-    lastName: "渡邊",
-    password: "password",
-    firstName: "翼",
-    storeName: "イオン東雲店",
-  },
-  {
-    lastName: "伊音",
-    password: "password",
-    firstName: "太郎",
-    storeName: "イオン船橋店",
-  },
-  {
-    lastName: "イオン",
-    password: "password",
-    firstName: "花子",
-    storeName: "イオンスタイル千葉みなと",
-  },
-];
-
-
-export const action = async ({ request }: { request: Request }) => {
+export const action = async ({ request, context }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const lastName = formData.get("lastName")?.toString();
   const password = formData.get("password")?.toString();
+  let env: Env;
+  try {
+    env = process.env as unknown as Env; // ローカルはnodeなのでprocess.env
+  } catch {
+    env = context.cloudflare.env as Env; // Cloudflare Pagesはcontext.cloudflare.env
+  }
+  const { API_BASE_URL } = env
 
   if (!lastName || !password) {
     return Response.json({ error: "すべてのフィールドを入力してください" }, { status: 400 });
   }
+  const body: DataTypeForLogin = {
+    lastName: lastName,
+    password: password
+  }
+  const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  })
 
-  // ユーザーの認証
-  const user = SAMPLE_USERS.find(
-    (user) => user.lastName === lastName && user.password === password
-  );
-
-  if (user) {
+  if (res.status === 200) {
+    const user = await res.json() as LoginResponseType;
     // ログイン成功時のデータ
     const userData = {
       lastName: user.lastName,
@@ -82,7 +74,7 @@ export default function Login() {
             <div className="grid grid-cols-2">
               <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                  氏名
+                  氏
                 </label>
                 <Input
                   type="text"

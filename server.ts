@@ -3,12 +3,19 @@ import { createRequestHandler, type ServerBuild } from "@remix-run/cloudflare";
 // @ts-ignore This file won’t exist if it hasn’t yet been built
 import * as build from "./build/server"; // eslint-disable-line import/no-unresolved
 import { getLoadContext } from "./load-context";
+import { handleApi } from "api";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handleRemixRequest = createRequestHandler(build as any as ServerBuild);
 
 export default {
   async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    // /api 配下のパスなら、自前の API 処理へ
+    if (url.pathname.startsWith("/api")) {
+      return handleApi(request, env, ctx);
+    }
     try {
       const loadContext = getLoadContext({
         request,
