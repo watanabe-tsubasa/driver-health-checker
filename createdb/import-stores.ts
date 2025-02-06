@@ -33,7 +33,7 @@ fs.createReadStream(CSV_FILE)
     console.log(sql);
 
     // SQL を Cloudflare D1 に適用
-    execSync(`bunx wrangler d1 execute ${DATABASE_NAME} --local --command="${sql}"`, {
+    execSync(`bunx wrangler d1 execute ${DATABASE_NAME} --remote --command="${sql}"`, {
       stdio: "inherit",
     });
 

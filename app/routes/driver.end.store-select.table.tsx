@@ -42,7 +42,7 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   const { API_BASE_URL } = env;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/driver-end/store-select-table?storeCode=${storeCode}`);
+    const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/driver-end/store-select-table?storeCode=${storeCode}`);
     
     if (!response.ok) {
       const errorData = await response.json() as {error: string};

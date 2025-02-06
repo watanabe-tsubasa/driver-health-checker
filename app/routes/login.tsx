@@ -28,7 +28,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
     userName: userName,
     password: password
   }
-  const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+  const res = await env.API_WORKER.fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

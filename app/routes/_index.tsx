@@ -6,7 +6,7 @@ import { Separator } from "~/components/ui/separator";
 export default function Index() {
   return (
     <div className="h-screen-header w-full flex justify-center items-start p-2">
-      <Card className="h-full w-full flex justify-center items-center">
+      <Card className="h-full w-full max-w-md flex justify-center items-center">
         <CardContent>
           <div className="flex flex-col items-center justify-center space-y-10">
             <Link to='/driver/start' className="w-full">

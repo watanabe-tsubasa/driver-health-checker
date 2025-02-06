@@ -12,15 +12,29 @@ import { handleGetStores } from "./get-stores";
 export async function handleApi(request: Request, env: Env, ctx: ExecutionContext) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/^\/api/, ""); // "/api" を除去
+  console.log(`🔹 Received API request: ${path}`); // 🔥 リクエストをログに出力
 
-  if (path === "/test" && request.method === "GET") {
-    return new Response(JSON.stringify({ message: "hello api" }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  try {
+    if (path === "/test" && request.method === "GET") {
+      return new Response(JSON.stringify({ message: "hello api" }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Unexpected error:", error);
+    return new Response(
+      JSON.stringify({ error: "Internal Server Error", message: error.message }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
+  
 
   if (path === "/stores" && request.method === "GET") {
     return handleGetStores(request, env, ctx)

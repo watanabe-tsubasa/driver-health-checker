@@ -32,7 +32,7 @@ export default function DriverStoreSelect() {
   const { stores } = useLoaderData<LoaderDataType>();
   return (
     <div className="h-screen-header min-w-full flex justify-center items-start p-2">
-      <Card className="w-full h-full">
+      <Card className="w-full h-full max-w-md">
         <CardHeader>
           <CardTitle>帰着登録</CardTitle>
           <CardDescription>店舗を選択してください</CardDescription>
@@ -46,7 +46,7 @@ export default function DriverStoreSelect() {
           </Form>
         </CardContent>
         <Separator />
-        <CardFooter className="overflow-scroll">
+        <CardFooter className="overflow-auto">
           <Outlet />
         </CardFooter>
       </Card>

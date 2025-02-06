@@ -49,7 +49,7 @@ export const action = async({ request, context }: ActionFunctionArgs) => {
   }
 
   // 🔹 API にリクエスト
-  const response = await fetch(`${API_BASE_URL}/api/driver-start`, {
+  const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/driver-start`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

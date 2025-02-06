@@ -5,4 +5,5 @@ interface Env {
 	BASIC_AUTH_PASSWORD: string;
 	API_BASE_URL: string;
   DB: D1Database;
+  API_WORKER: Fetcher
 }

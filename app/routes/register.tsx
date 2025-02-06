@@ -57,7 +57,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
     return Response.json({ error: "パスワードが一致しません。" }, { status: 400 });
   }
   // API に登録リクエストを送信
-  const response = await fetch(`${env.API_BASE_URL}/api/auth/register`, {
+  const response = await env.API_WORKER.fetch(`${env.API_BASE_URL}/api/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -60,7 +60,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
     alcoholTestSecondResult,
   };
 
-  const response = await fetch(`${API_BASE_URL}/api/driver-end/store-select-table-form`, {
+  const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/driver-end/store-select-table-form`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

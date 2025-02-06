@@ -19,7 +19,7 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
     role: loginData.role,
   }).toString();
   
-  const res = await fetch(`${API_BASE_URL}/api/approve/storemanager-board?${queryParams}`);
+  const res = await env.API_WORKER.fetch(`${API_BASE_URL}/api/approve/storemanager-board?${queryParams}`);
 
   if (!res.ok) {
     return redirect("/error");
@@ -50,7 +50,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
 
   const env = callEnv(context);
   const { API_BASE_URL } = env;
-  const response = await fetch(`${API_BASE_URL}/api/approve/storemanager-board`, {
+  const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/approve/storemanager-board`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ allData, managerId, role }),

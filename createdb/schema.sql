@@ -78,7 +78,7 @@ CREATE TABLE end_check_approvals (
   approver_role TEXT CHECK(approver_role IN ('leader', 'store_manager', 'ns_manager')) NOT NULL,
   approval_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   result BOOLEAN NOT NULL,
-  FOREIGN KEY (start_check_id) REFERENCES start_checks (id) ON DELETE CASCADE,
+  FOREIGN KEY (end_check_id) REFERENCES end_checks (id) ON DELETE CASCADE,
   FOREIGN KEY (manager_id) REFERENCES managers (id) ON DELETE CASCADE
 );
 

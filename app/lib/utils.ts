@@ -9,9 +9,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export const fetchStores = async (env: Env): Promise<Store[]> => {
   const { API_BASE_URL } = env;
+  console.log(env)
+  console.log(API_BASE_URL)
   try {
-    const response = await fetch(`${API_BASE_URL}/api/stores`);
-    if (!response.ok) throw new Error("店舗情報の取得に失敗しました");
+    const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/stores`);
+    if (!response.ok) throw new Error("店舗の取得に失敗しました");
     const data: Store[] = await response.json();
     return data
   } catch (error) {
@@ -74,7 +76,7 @@ export const commonDashboardLoader = async (
   const env = callEnv(context);
   const { API_BASE_URL } = env;
   const queryParams = new URLSearchParams({ storeCode: loginData.storeCode, role: loginData.role }).toString();
-  const res = await fetch(`${API_BASE_URL}/api/approve/dashboard-${direction}?${queryParams}`);
+  const res = await env.API_WORKER.fetch(`${API_BASE_URL}/api/approve/dashboard-${direction}?${queryParams}`);
   const filteredData = direction === 'start' ? 
     await res.json() as DashboardStartDriverData[] :
     await res.json() as DashboardEndDriverData[];
@@ -98,7 +100,7 @@ export const commonDashboardAciton = async (
 
   const env = callEnv(context);
   const { API_BASE_URL } = env;
-  const response = await fetch(`${API_BASE_URL}/api/approve/dashboard-${direction}`, {
+  const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/approve/dashboard-${direction}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ selectedData, managerId, role }),

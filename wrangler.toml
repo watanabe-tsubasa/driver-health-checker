@@ -14,3 +14,7 @@ enabled = true
 binding = "DB"
 database_name = "driver-health-checker"
 database_id = "d1c74bf4-fef2-4d36-94d7-dfa8ab8a557b"
+
+[[services]]
+binding = "API_WORKER"
+service = "driver-health-checker"
