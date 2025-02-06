@@ -4,14 +4,17 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
-import type { LinksFunction } from "@remix-run/cloudflare";
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/cloudflare";
 
 import "./tailwind.css";
 
 import { CustomSidebar } from "./components/Sidebar";
 import { useState } from "react";
 import { Header } from "./components/Header";
+import { LoginResponseType } from "./lib/types";
+import { getLoginDataFromCookie } from "./lib/utils";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -25,6 +28,11 @@ export const links: LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = getLoginDataFromCookie(request);
+  return Response.json({ user });
+};
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -45,12 +53,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const { user } = useLoaderData<{user: LoginResponseType | null}>()
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div>
       {/* <Header /> */}
       <div className="flex flex-col h-screen bg-background">
-        <Header onOpenSidebar={() => setSidebarOpen(true)} />
+        <Header user={user} onOpenSidebar={() => setSidebarOpen(true)} />
         <div className="flex flex-1 overflow-hidden">
           <CustomSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
           <div className="flex-1 overflow-auto md:ml-64">

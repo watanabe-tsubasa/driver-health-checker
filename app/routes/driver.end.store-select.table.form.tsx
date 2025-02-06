@@ -1,10 +1,10 @@
-import { redirect } from '@remix-run/cloudflare';
+import { ActionFunctionArgs, LoaderFunctionArgs, redirect } from '@remix-run/cloudflare';
 import { useLoaderData, Form } from "@remix-run/react";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
 import { Switch } from "~/components/ui/switch";
-import { DriverActionRequest } from './driver.start';
+import { callEnv } from '~/lib/utils';
 
 type LoaderData = {
   storeName: string;
@@ -12,53 +12,70 @@ type LoaderData = {
   deliveryCompany: string;
 };
 
-export const loader = async ({ request }: { request: Request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
+  const id = url.searchParams.get("id") || "";
+  const storeCode = url.searchParams.get("storeCode") || "";
   const storeName = url.searchParams.get("storeName") || "";
   const driverName = url.searchParams.get("driverName") || "";
   const deliveryCompany = url.searchParams.get("deliveryCompany") || "";
 
-  return Response.json({ storeName, driverName, deliveryCompany });
+  return Response.json({ id, storeCode, storeName, driverName, deliveryCompany });
 }
 
-export const action = async ({ request }: DriverActionRequest) => {
-  const formData = await request.formData();
+export const action = async ({ request, context }: ActionFunctionArgs) => {
+  const url = new URL(request.url);
+  const startCheckId = url.searchParams.get("id"); // start_checks の ID
+  const storeCode = url.searchParams.get("storeCode");
 
-  const storeName = formData.get('storeName');
-  const driverName = formData.get('driverName');
-  const deliveryCompany = formData.get('deliveryCompany');
-  const hasUsedAlcoholChecker = formData.get('hasUsedAlcoholChecker') === 'on';
-  const alcoholTestFirstResult = parseFloat(formData.get('alcoholTestFirstResult') as string || '0');
-  const alcoholTestSecondResult = parseFloat(formData.get('alcoholTestSecondResult') as string || '0');
-  const hasIllness = formData.get('hasIllness') === 'on';
-  const isTired = formData.get('isTired') === 'on';
-
-  if (typeof storeName !== 'string' ||
-      typeof driverName !== 'string' ||
-      typeof deliveryCompany !== 'string' ||
-      isNaN(alcoholTestFirstResult) || 
-      isNaN(alcoholTestSecondResult)) {
-    return new Response(JSON.stringify({ error: '必須項目をすべて入力してください。' }), {
+  if (!startCheckId || !storeCode) {
+    return new Response(JSON.stringify({ error: 'ID または storeCode が指定されていません。' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
   }
-  // フォームデータをサーバー側で処理するロジックをここに追加
-  // 例: データベースに保存
-  console.log(formData);
-  console.log({
-    storeName,
-    driverName,
-    deliveryCompany,
+
+  const formData = await request.formData();
+  const hasUsedAlcoholChecker = formData.get('hasUsedAlcoholChecker') === 'on';
+  const alcoholTestFirstResult = parseFloat(formData.get('alcoholTestFirstResult') as string || '0');
+  const alcoholTestSecondResult = formData.get('alcoholTestSecondResult')
+    ? parseFloat(formData.get('alcoholTestSecondResult') as string)
+    : null;
+
+  if (isNaN(alcoholTestFirstResult) || (alcoholTestSecondResult !== null && isNaN(alcoholTestSecondResult))) {
+    return new Response(JSON.stringify({ error: 'アルコール測定結果が無効です。' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const env = callEnv(context);
+  const { API_BASE_URL } = env;
+
+  // 🔹 API に登録リクエストを送信
+  const payload = {
+    startCheckId: Number(startCheckId),
     hasUsedAlcoholChecker,
     alcoholTestFirstResult,
     alcoholTestSecondResult,
-    hasIllness,
-    isTired,
+  };
+
+  const response = await fetch(`${API_BASE_URL}/api/driver-end/store-select-table-form`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
 
+  if (!response.ok) {
+    const errorData = await response.json();
+    return new Response(
+      JSON.stringify(errorData),
+      { status: response.status, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   return redirect('/success');
-}
+};
 
 export default function DriverHealthCheckForm() {
   const { storeName, driverName, deliveryCompany } = useLoaderData<LoaderData>();

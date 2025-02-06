@@ -1,21 +1,26 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
+// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
 import { Button } from "~/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import { DriverLog } from "~/lib/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "~/components/ui/dialog";
+import { DashboardEndDriverData, DashboardStartDriverData } from "~/lib/types";
+import { convertToJSTDate, isStartDriverData } from "~/lib/utils";
 
-interface AdminTableActionsProps {
-  data: DriverLog;
-}
-
-export const AdminTableActions: React.FC<AdminTableActionsProps> = ({ data }) => {
+export const ApproveTableActions = ({ data }: { data: DashboardStartDriverData | DashboardEndDriverData}) => {
   const [open, setOpen] = useState(false);
+  const isStart = isStartDriverData(data);
 
   return (
     <>
-      <DropdownMenu>
+      <Button
+       variant="ghost"
+       className="h-8 w-8 p-0"
+       onClick={() => setOpen(true)}
+      >
+        <MoreHorizontal />
+      </Button>
+      {/* <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
             <MoreHorizontal />
@@ -31,7 +36,7 @@ export const AdminTableActions: React.FC<AdminTableActionsProps> = ({ data }) =>
             View Details
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
@@ -40,15 +45,21 @@ export const AdminTableActions: React.FC<AdminTableActionsProps> = ({ data }) =>
             <DialogDescription>ドライバーの詳細情報を表示します。</DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
-            <p><strong>ID:</strong> {data.id}</p>
+            {/* <p><strong>ID:</strong> {data.id}</p> */}
+            <p>
+              <strong>登録日時:</strong> {
+              convertToJSTDate(new Date(data.createdAt))
+              .toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })
+              }
+            </p>
             <p><strong>店舗名:</strong> {data.storeName}</p>
             <p><strong>氏名:</strong> {data.driverName}</p>
             <p><strong>配送会社:</strong> {data.deliveryCompany}</p>
             <p><strong>アルコールチェッカー使用:</strong> {data.hasUsedAlcoholChecker ? "有" : "無"}</p>
             <p><strong>アルコール測定(1回目):</strong> {data.alcoholTestFirstResult}</p>
             <p><strong>アルコール測定(2回目):</strong> {data.alcoholTestSecondResult ?? "-"}</p>
-            <p><strong>疾病の有無:</strong> {data.hasIllness ? "有" : "無"}</p>
-            <p><strong>疲労の有無:</strong> {data.isTired ? "有" : "無"}</p>
+            {isStart && <p><strong>疾病の有無:</strong> {data.hasIllness ? "有" : "無"}</p>}
+            {isStart && <p><strong>疲労の有無:</strong> {data.isTired ? "有" : "無"}</p>}
           </div>
         </DialogContent>
       </Dialog>

@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react';
+import { NavLink } from '@remix-run/react';
 import { Input } from '~/components/ui/input';
 import {
   Sheet,
@@ -6,11 +6,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from '~/components/ui/sheet';
+import { cn } from '~/lib/utils';
 
 const menuItems = [
   { name: "配送前登録", href: "/driver/start" },
   { name: "帰着後登録", href: "/driver/end/store-select" },
-  { name: "承認画面", href: "/dashboard/admin" },
+  { name: "承認画面", href: "/approve/dashboard/start" },
   { name: "トップページ", href: "/" },
 ];
 
@@ -24,13 +25,18 @@ const SidebarContent = () => (
         <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">Menu</h2>
         <div className="space-y-1">
           {menuItems.map((item) => (
-            <Link
+            <NavLink
               key={item.name}
               to={item.href}
-              className="flex items-center px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:bg-accent focus:text-accent-foreground"
+              className={({ isActive }) => cn(
+                "flex items-center px-4 py-2 text-sm font-medium rounded-md", 
+                isActive
+                ? "bg-gray-100 text-foreground shadow-sm"
+                : " hover:bg-accent hover:text-accent-foreground focus:outline-none focus:bg-accent focus:text-accent-foreground",
+              )}
             >
               {item.name}
-            </Link>
+            </NavLink>
           ))}
         </div>
       </div>

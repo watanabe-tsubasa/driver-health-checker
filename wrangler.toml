@@ -9,3 +9,8 @@ assets = { directory = "./build/client" }
 # Configuration: https://developers.cloudflare.com/workers/observability/logs/workers-logs/#enable-workers-logs
 [observability]
 enabled = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "driver-health-checker"
+database_id = "d1c74bf4-fef2-4d36-94d7-dfa8ab8a557b"

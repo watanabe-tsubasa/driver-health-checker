@@ -1,4 +1,5 @@
 import { Outlet, useLoaderData, useNavigate } from "@remix-run/react";
+import { LoaderFunctionArgs } from "@remix-run/server-runtime";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Drawer, DrawerContent } from "~/components/ui/drawer";
@@ -11,75 +12,83 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { callEnv } from "~/lib/utils";
 
 // StoreData 型定義
-type StoreData = {
+interface StoreData  {
   id: number;
+  storeCode: string;
   storeName: string;
   driverName: string;
   deliveryCompany: string;
-};
+}
 
 // Loader の戻り値の型定義
-type LoaderData = {
+interface LoaderData  {
   filteredData: StoreData[];
-  storeName: string;
-};
-
-// ダミーデータ
-const storeData: StoreData[] = [
-  { id: 1, storeName: "イオン東雲店", driverName: "山田太郎", deliveryCompany: "ヤマト運輸" },
-  { id: 2, storeName: "イオン船橋店", driverName: "佐藤花子", deliveryCompany: "佐川急便" },
-  { id: 3, storeName: "イオンスタイル幕張新都心", driverName: "鈴木一郎", deliveryCompany: "日本郵便" },
-  { id: 4, storeName: "イオン海浜幕張店", driverName: "田中美咲", deliveryCompany: "福山通運" },
-  { id: 5, storeName: "イオンスタイル品川シーサイド", driverName: "高橋健太", deliveryCompany: "西濃運輸" },
-];
+  storeCode: string;
+}
 
 // Loader関数
-export const loader = async ({ request }: { request: Request }) => {
+export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
-  const storeName = url.searchParams.get("storeName");
+  const storeCode = url.searchParams.get("storeCode");
 
-  if (!storeName) {
-    return Response.json({ filteredData: [], error: "店舗名が指定されていません。" });
+  if (!storeCode) {
+    return Response.json({ filteredData: [], error: "storeCode が指定されていません。" });
   }
 
-  const filteredData = storeData.filter((store) =>
-    store.storeName.includes(storeName)
-  );
+  const env = callEnv(context);
+  const { API_BASE_URL } = env;
 
-  return Response.json({ filteredData, storeName });
-}
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/driver-end/store-select-table?storeCode=${storeCode}`);
+    
+    if (!response.ok) {
+      const errorData = await response.json() as {error: string};
+      return Response.json({ filteredData: [], error: errorData.error });
+    }
+
+    const filteredData = await response.json();
+    console.log(`filteredData: ${filteredData}`)
+    return Response.json({ filteredData, storeCode });
+
+  } catch (error) {
+    console.error("API Fetch Error:", error);
+    return Response.json({ filteredData: [], error: "データ取得に失敗しました。" });
+  }
+};
+
 
 // コンポーネント
 export default function StoreTable() {
-  // useLoaderDataの型をLoaderDataに指定
-  const { filteredData, storeName } = useLoaderData<LoaderData>();
+  const { filteredData, storeCode } = useLoaderData<LoaderData>();
   const navigate = useNavigate();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
   const handleOpenForm = (data: StoreData) => {
     const queryParams = new URLSearchParams({
+      id: String(data.id),
+      storeCode: data.storeCode,
       storeName: data.storeName,
       driverName: data.driverName,
       deliveryCompany: data.deliveryCompany,
     });
     navigate(`/driver/end/store-select/table/form?${queryParams.toString()}`);
-    setDrawerOpen(true); // Drawerを開く
+    setDrawerOpen(true);
   };
 
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
-    navigate(`/driver/end/store-select/table?storeName=${storeName}`); // Drawerを閉じた後に親ルートに戻す
+    navigate(`/driver/end/store-select/table?storeCode=${storeCode}`);
   };
 
   return (
     <div className="container mx-auto py-10">
       <Table>
-        <TableCaption>{storeName}｜配送前登録</TableCaption>
+        <TableCaption>{storeCode}｜配送前登録</TableCaption>
         <TableHeader>
           <TableRow>
-            {/* <TableHead>店舗名</TableHead> */}
             <TableHead>配送会社</TableHead>
             <TableHead>氏名</TableHead>
             <TableHead></TableHead>
@@ -89,10 +98,11 @@ export default function StoreTable() {
           {filteredData.length > 0 ? (
             filteredData.map((store) => (
               <TableRow key={store.id}>
-                {/* <TableCell className="font-medium">{store.storeName}</TableCell> */}
                 <TableCell>{store.deliveryCompany}</TableCell>
                 <TableCell>{store.driverName}</TableCell>
-                <TableCell><Button onClick={() => handleOpenForm(store)}>選択</Button></TableCell>
+                <TableCell>
+                  <Button onClick={() => handleOpenForm(store)}>選択</Button>
+                </TableCell>
               </TableRow>
             ))
           ) : (
