@@ -21,6 +21,11 @@ export interface LoginResponseType {
   role: RoleType;
 }
 
+// editStoreNames
+export interface EditStoreNamesRequest {
+  updates: Store[];
+}
+
 // register
 export interface RegisterRequestData {
   lastName: string;

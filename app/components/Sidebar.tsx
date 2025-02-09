@@ -15,6 +15,7 @@ const menuItems = [
   { name: "帰着後登録", href: "/driver/end/store-select" },
   { name: "承認画面", href: "/approve/dashboard/start" },
   { name: "管理画面", href: "/admin/dashboard" },
+  { name: "店名変更", href: "/edit/storeName" },
   { name: "トップページ", href: "/" },
 ];
 

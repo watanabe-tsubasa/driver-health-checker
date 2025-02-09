@@ -8,6 +8,7 @@ import { handleDriverEndStoreSelectTable } from "./driver-end/store-select-table
 import { handleDriverEndStoreSelectTableForm } from "./driver-end/store-select-table-form";
 import { handleDriverStart } from "./driver-start";
 import { handleGetStores } from "./get-stores";
+import { handleUpdateStores } from "./update-stores";
 
 export async function handleApi(request: Request, env: Env, ctx: ExecutionContext) {
   const url = new URL(request.url);
@@ -37,6 +38,11 @@ export async function handleApi(request: Request, env: Env, ctx: ExecutionContex
   // /api/stores
   if (path === "/stores" && request.method === "GET") {
     return handleGetStores(request, env, ctx)
+  }
+
+  // /api/stores/update
+  if (path.startsWith("/stores/update")) {
+    return handleUpdateStores(request, env)
   }
 
   // /api/admin/dashboard
