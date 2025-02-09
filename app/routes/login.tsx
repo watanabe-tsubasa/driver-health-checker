@@ -4,41 +4,43 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "~/components/ui/card";
 import { LoginData, LoginResponseType } from "~/lib/types";
-import { callEnv, getLoginDataFromCookie } from "~/lib/utils";
+import { callEnv, getLoginDataFromCookie, innerFetch } from "~/lib/utils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const loginData = getLoginDataFromCookie(request);
-  if(loginData) {
-    return redirect("/approve/dashboard/start");
+  const url = new URL(request.url);
+  const redirectTo = url.searchParams.get("redirect") || "/"; 
+
+  if (loginData) {
+    return redirect(redirectTo);  // 既にログイン済みならリダイレクト
   }
   return Response.json({});
-}
+};
 
 export const action = async ({ request, context }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const userName = formData.get("userName")?.toString();
   const password = formData.get("password")?.toString();
   const env = callEnv(context);
-  const { API_BASE_URL } = env
+  const url = new URL(request.url);
+  const redirectTo = 
+    url.searchParams.get("redirect") ||
+    request.headers.get("Referer") ||
+    "/"; 
 
   if (!userName || !password) {
     return Response.json({ error: "すべてのフィールドを入力してください" }, { status: 400 });
   }
-  const body: LoginData = {
-    userName: userName,
-    password: password
-  }
-  const res = await env.API_WORKER.fetch(`${API_BASE_URL}/api/auth/login`, {
+
+  const body: LoginData = { userName, password };
+  const res = await innerFetch(env, '/api/auth/login', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
-  })
+  });
 
   if (res.status === 200) {
     const user = await res.json() as LoginResponseType;
-    // ログイン成功時のデータ
     const userData = {
       id: user.id,
       lastName: user.lastName,
@@ -47,18 +49,15 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
       storeName: user.storeName,
       role: user.role,
     };
-
-    // JSONを文字列化してエンコード
     const encodedUserData = encodeURIComponent(JSON.stringify(userData));
 
-    return redirect("/approve/dashboard/start", {
+    return redirect(redirectTo, {
       headers: {
         "Set-Cookie": `user=${encodedUserData}; HttpOnly; Path=/; SameSite=Strict`,
       },
     });
   }
 
-  // ログイン失敗
   return Response.json({ error: "無効な氏名またはパスワードです" }, { status: 401 });
 };
 

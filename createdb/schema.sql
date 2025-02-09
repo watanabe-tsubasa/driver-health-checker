@@ -15,16 +15,15 @@ CREATE TABLE sites (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 管理者テーブル（store_code でリレーション）
 CREATE TABLE managers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  store_code TEXT NOT NULL, -- store_code をリレーションキーに
-  login_id TEXT UNIQUE NOT NULL, -- ログイン用の一意キー
+  store_code TEXT, -- masterアカウントでstore_code nullを許容したい
+  login_id TEXT UNIQUE NOT NULL,
   last_name TEXT NOT NULL,
   first_name TEXT NOT NULL,
   password_hash TEXT NOT NULL,
   salt TEXT NOT NULL,
-  role TEXT CHECK(role IN ('leader', 'ns_manager', 'store_manager')) NOT NULL,
+  role TEXT CHECK(role IN ('leader', 'ns_manager', 'store_manager', 'master')) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (store_code) REFERENCES sites (store_code) ON DELETE CASCADE

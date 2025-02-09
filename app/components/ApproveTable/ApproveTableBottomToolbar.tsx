@@ -11,12 +11,12 @@ export const ApproveTableBottomToolbar = <T extends DashboardStartDriverData | D
   table: Table<T>
 }) => {
   return(
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <Form method="post">
         <input type="hidden" name="selectedData" value={JSON.stringify(selectedData)} />
         <input type="hidden" name="managerId" value={loginData.id} />
         <input type="hidden" name="role" value={loginData.role} />
-        <div className="flex justify-end space-x-2 py-4">
+        <div className="flex justify-end space-x-2 py-2">
           <Button
             type="submit"
             variant="secondary"
@@ -28,7 +28,7 @@ export const ApproveTableBottomToolbar = <T extends DashboardStartDriverData | D
           </Button>
         </div>
       </Form>
-      <div className="flex justify-end space-x-2 py-4">
+      <div className="flex justify-end space-x-2 py-2">
         <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
           前
         </Button>

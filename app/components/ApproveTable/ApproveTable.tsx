@@ -18,6 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~
 import { columns } from "./ApproveTable.columns"
 import { DashboardEndDriverData, DashboardStartDriverData, LoginResponseType } from "~/lib/types"
 import { ApproveTableBottomToolbar } from "./ApproveTableBottomToolbar"
+import { Separator } from "../ui/separator"
 // import { ApprooveTableTopToolbar } from "./ApprooveTableTopToolbar"
 
 export const ApproveTable = <T extends DashboardStartDriverData | DashboardEndDriverData>({ filteredData, loginData }: {
@@ -97,7 +98,7 @@ export const ApproveTable = <T extends DashboardStartDriverData | DashboardEndDr
           )}
         </TableBody>
       </Table>
-
+      <Separator />
       <ApproveTableBottomToolbar
        selectedData={selectedData}
        loginData={loginData}

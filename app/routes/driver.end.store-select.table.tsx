@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { callEnv } from "~/lib/utils";
+import { callEnv, innerFetch } from "~/lib/utils";
 
 // StoreData 型定義
 interface StoreData  {
@@ -39,10 +39,8 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   }
 
   const env = callEnv(context);
-  const { API_BASE_URL } = env;
-
   try {
-    const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/driver-end/store-select-table?storeCode=${storeCode}`);
+    const response = await innerFetch(env, `/api/driver-end/store-select-table?storeCode=${storeCode}`);
     
     if (!response.ok) {
       const errorData = await response.json() as {error: string};
@@ -50,7 +48,6 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
     }
 
     const filteredData = await response.json();
-    console.log(`filteredData: ${filteredData}`)
     return Response.json({ filteredData, storeCode });
 
   } catch (error) {
@@ -116,13 +113,15 @@ export default function StoreTable() {
       </Table>
 
       <Drawer open={isDrawerOpen} onOpenChange={setDrawerOpen}>
-        <DrawerContent>
-          <div className="flex justify-end">
-            <Button variant="ghost" onClick={handleCloseDrawer}>
-              閉じる
-            </Button>
+        <DrawerContent className="min-w-full flex items-center">
+          <div className="max-w-md">
+            <div className="flex justify-end">
+              <Button variant="ghost" onClick={handleCloseDrawer}>
+                閉じる
+              </Button>
+            </div>
+            <Outlet />
           </div>
-          <Outlet />
         </DrawerContent>
       </Drawer>
     </div>

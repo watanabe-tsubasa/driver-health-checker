@@ -6,7 +6,8 @@ import { ManagerRoleSelect, StoreSearchCombobox } from "~/components/FormUI";
 import { HeadersFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/cloudflare";
 import { useState } from "react";
 import { RegisterResponse, Store } from "~/lib/types";
-import { callEnv, fetchStores } from "~/lib/utils";
+import { callEnv, fetchStores, innerFetch } from "~/lib/utils";
+import { AccessDenied } from "~/components/FunctionalComponents";
 
 export const headers: HeadersFunction = () => ({
   "WWW-Authenticate": "Basic",
@@ -22,21 +23,19 @@ const isAuthorized = (request: Request, USERNAME: string, PASSWORD: string) => {
   return username === USERNAME && password === PASSWORD;
 };
 
-interface LoaderDataType {
+// Loader 関数
+interface TypeOfLoader {
   authorized: boolean;
-  stores: Store[];
+  storesPromise: Promise<Store[]>;
 }
 
-// Loader 関数
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   const env = callEnv(context);
   const { BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD } = env;
   if (!isAuthorized(request, BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD)) {
     return Response.json({ authorized: false }, { status: 401 });
   }
-
-  const stores = await fetchStores(env)
-  return Response.json({ authorized: true, stores: stores });
+  return { authorized: true, storesPromise: fetchStores(env) };
 };
 
 // Action 関数
@@ -57,7 +56,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
     return Response.json({ error: "パスワードが一致しません。" }, { status: 400 });
   }
   // API に登録リクエストを送信
-  const response = await env.API_WORKER.fetch(`${env.API_BASE_URL}/api/auth/register`, {
+  const response = await innerFetch(env, '/api/auth/register', {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -77,18 +76,23 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
 
 // 登録フォームコンポーネント
 export default function Register() {
-  const { authorized, stores } = useLoaderData<LoaderDataType>();
+  const { authorized, storesPromise } = useLoaderData<TypeOfLoader>();
   const actionData = useActionData<RegisterResponse>(); // Action のレスポンスを取得
   const [userName, setUserName] = useState("");
   const [role, setRole] = useState("");
  
   if (!authorized) {
     return (
-      <div className="flex items-center justify-center min-h-screen-header bg-gray-50">
-        <Card className="w-full h-40 m-4 flex items-center justify-center">
+      <AccessDenied>
+        <div className="flex flex-col justify-center items-center">
           <p>登録にはパスワードが必要です</p>
-        </Card>
-      </div>
+          <Link to={`/`}>
+            <Button variant="link" size="sm" className="mx-2">
+              トップに戻る
+            </Button>
+          </Link>
+        </div>
+      </AccessDenied>
     );
   }
 
@@ -111,7 +115,7 @@ export default function Register() {
               </div>
             </div>
             <div>
-              <StoreSearchCombobox stores={stores} />
+              <StoreSearchCombobox storesPromise={storesPromise} />
             </div>
             <div>
               <ManagerRoleSelect onChange={(value) => setRole(value)} />

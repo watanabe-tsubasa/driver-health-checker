@@ -2,24 +2,23 @@ import { ActionFunctionArgs, LoaderFunctionArgs, redirect } from "@remix-run/clo
 import { useLoaderData } from "@remix-run/react";
 import { StoremanagerTable } from "~/components/StoremanagerTable/StoremanagerTable";
 import { DashboardStoreManagerData, LoginResponseType } from "~/lib/types";
-import { getLoginDataFromCookie, callEnv, roleTransition } from "~/lib/utils";
+import { getLoginDataFromCookie, callEnv, roleTransition, innerFetch, requireAuth } from "~/lib/utils";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   const loginData = getLoginDataFromCookie(request);
-  if (!loginData) return redirect("/login");
+  if (!loginData) return requireAuth(request, loginData);
 
   if (loginData.role !== "store_manager") {
     return redirect("/approve/dashboard/start");
   }
 
   const env = callEnv(context);
-  const { API_BASE_URL } = env;
   const queryParams = new URLSearchParams({
     storeCode: loginData.storeCode,
     role: loginData.role,
   }).toString();
   
-  const res = await env.API_WORKER.fetch(`${API_BASE_URL}/api/approve/storemanager-board?${queryParams}`);
+  const res = await innerFetch(env, `/api/approve/storemanager-board?${queryParams}`);
 
   if (!res.ok) {
     return redirect("/error");
@@ -49,8 +48,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
   }
 
   const env = callEnv(context);
-  const { API_BASE_URL } = env;
-  const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/approve/storemanager-board`, {
+  const response = await innerFetch(env, `/api/approve/storemanager-board`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ allData, managerId, role }),

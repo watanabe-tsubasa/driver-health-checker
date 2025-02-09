@@ -1,7 +1,7 @@
 import { Link } from '@remix-run/react';
 import { Menu } from 'lucide-react';
 import { Button } from '~/components/ui/button';
-import { LogoutButton } from './FunctionalComponents';
+import { LoginButton, LogoutButton } from './FunctionalComponents';
 import { LoginResponseType } from '~/lib/types';
 
 interface HeaderProps {
@@ -28,9 +28,7 @@ export function Header({ user, onOpenSidebar }: HeaderProps) {
               <LogoutButton user={user}/>
             </div>
           ) : (
-            <Link to="/login">
-              <Button variant="outline" size="sm" className='mx-2'>ログイン</Button>
-            </Link>
+            <LoginButton />
           )}
         </div>
       </div>

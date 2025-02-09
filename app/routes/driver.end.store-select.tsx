@@ -1,20 +1,15 @@
-import { Form, Outlet, useLoaderData } from "@remix-run/react";
+import { Form, Outlet, useLoaderData, useNavigation } from "@remix-run/react";
 import { LoaderFunctionArgs, redirect } from "@remix-run/cloudflare";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { StoreSearchCombobox } from "~/components/FormUI";
 import { Separator } from "~/components/ui/separator";
 import { callEnv, fetchStores } from "~/lib/utils";
-import { Store } from "~/lib/types";
-
-interface LoaderDataType {
-  stores: Store[];
-}
+import { Loader2 } from "lucide-react";
 
 export const loader = async ({ context }: LoaderFunctionArgs) => {
   const env = callEnv(context);
-  const stores = await fetchStores(env);
-  return Response.json({stores});
+  return {storesPromise: fetchStores(env)};
 }
 
 export const action = async ({ request }: { request: Request }) => {
@@ -29,7 +24,9 @@ export const action = async ({ request }: { request: Request }) => {
 }
 
 export default function DriverStoreSelect() {
-  const { stores } = useLoaderData<LoaderDataType>();
+  const { storesPromise } = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
   return (
     <div className="h-screen-header min-w-full flex justify-center items-start p-2">
       <Card className="w-full h-full max-w-md">
@@ -39,9 +36,9 @@ export default function DriverStoreSelect() {
         </CardHeader>
         <CardContent>
           <Form method="post" className="space-y-4">
-            <StoreSearchCombobox stores={stores} />
+            <StoreSearchCombobox storesPromise={storesPromise} />
             <Button type="submit" className="w-full">
-              検索
+              {isSubmitting ? <Loader2 className="animate-spin" /> : '検索'}
             </Button>
           </Form>
         </CardContent>

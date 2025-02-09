@@ -5,23 +5,16 @@ import { Label } from '~/components/ui/label';
 import { Button } from '~/components/ui/button';
 import { Switch } from '~/components/ui/switch';
 import { StoreSearchCombobox } from '~/components/FormUI';
-import { callEnv, fetchStores } from '~/lib/utils';
-import { Store } from '~/lib/types';
-
-interface LoaderDataType {
-  stores: Store[];
-}
+import { callEnv, fetchStores, innerFetch } from '~/lib/utils';
 
 export const loader = async ({ context }: LoaderFunctionArgs) => {
   const env = callEnv(context);
-  const stores = await fetchStores(env);
-  return Response.json({stores});
+  return { storesPromise: fetchStores(env) };
 };
 
 export const action = async({ request, context }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const env = callEnv(context);
-  const { API_BASE_URL } = env;
 
   const payload = {
     storeCode: formData.get("storeCode"),
@@ -49,7 +42,7 @@ export const action = async({ request, context }: ActionFunctionArgs) => {
   }
 
   // 🔹 API にリクエスト
-  const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/driver-start`, {
+  const response = await innerFetch(env, '/api/driver-start', {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -71,7 +64,7 @@ interface DriverActionData {
 }
 
 export default function DriverHealthCheckForm() {
-  const { stores } = useLoaderData<LoaderDataType>()
+  const { storesPromise } = useLoaderData<typeof loader>()
   const actionData = useActionData<DriverActionData>();
 
   return (
@@ -79,7 +72,7 @@ export default function DriverHealthCheckForm() {
       {actionData?.error && (
         <div className="text-red-500 text-sm">{actionData.error}</div>
       )}
-      <StoreSearchCombobox stores={stores} />
+      <StoreSearchCombobox storesPromise={storesPromise} />
 
       <div className='space-y-2'>
         <Label htmlFor="driverName">氏名</Label>

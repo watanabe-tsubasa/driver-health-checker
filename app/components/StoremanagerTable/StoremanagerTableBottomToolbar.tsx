@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
 import { Button } from "~/components/ui/button"
-import { Form } from "@remix-run/react"
+import { Form, useNavigation } from "@remix-run/react"
 import { DashboardStoreManagerData, LoginResponseType } from "~/lib/types"
 import { Table } from "@tanstack/react-table"
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "~/components/ui/dialog"
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { Loader2 } from "lucide-react"
 // import { ApprooveTableTopToolbar } from "./ApprooveTableTopToolbar"
 
 export const StoremanagerTableBottomToolbar = ({ allData, loginData, table }: {
@@ -14,10 +15,19 @@ export const StoremanagerTableBottomToolbar = ({ allData, loginData, table }: {
   table: Table<DashboardStoreManagerData>
 }) => {
   const [open, setOpen] = useState(false);
+  const navigation = useNavigation();
   const hasApprovalData = allData.length !== 0
+  const isSubmitting = navigation.state === "submitting";
+
+  useEffect(() => {
+    if (isSubmitting) {
+      setOpen(false);
+    }
+    return () => setOpen(false);
+  }, [isSubmitting]);
 
   return(
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <Button
         type="button"
         onClick={() => setOpen(true)}
@@ -28,7 +38,7 @@ export const StoremanagerTableBottomToolbar = ({ allData, loginData, table }: {
       >
         {hasApprovalData ? '全件承認' : '承認が必要なデータはありません'}
       </Button>
-      <div className="flex justify-end space-x-2 py-4">
+      <div className="flex justify-end space-x-2 py-2">
         <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
           前
         </Button>
@@ -54,13 +64,14 @@ export const StoremanagerTableBottomToolbar = ({ allData, loginData, table }: {
                   disabled={!hasApprovalData}
                   className="min-w-20 flex-1"
                 >
-                  全件承認
+                  {isSubmitting ? <Loader2 className="animate-spin" /> : '全件承認'}
                 </Button>
               </Form>
               <Button
                type="button"
                variant="secondary"
                className="min-w-20"
+               onClick={() => setOpen(false)}
               >
                 キャンセル
               </Button>

@@ -4,7 +4,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
 import { Switch } from "~/components/ui/switch";
-import { callEnv } from '~/lib/utils';
+import { callEnv, innerFetch } from '~/lib/utils';
 
 type LoaderData = {
   storeName: string;
@@ -50,8 +50,6 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
   }
 
   const env = callEnv(context);
-  const { API_BASE_URL } = env;
-
   // 🔹 API に登録リクエストを送信
   const payload = {
     startCheckId: Number(startCheckId),
@@ -60,7 +58,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
     alcoholTestSecondResult,
   };
 
-  const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/driver-end/store-select-table-form`, {
+  const response = await innerFetch(env, `/api/driver-end/store-select-table-form`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

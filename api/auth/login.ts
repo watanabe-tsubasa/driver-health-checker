@@ -1,5 +1,5 @@
 import { verifyPassword } from "~/lib/auth";
-import { LoginData } from "~/lib/types";
+import { LoginData, RoleType } from "~/lib/types";
 
 export async function handleAuthLogin(
   request: Request,
@@ -28,7 +28,7 @@ export async function handleAuthLogin(
   const userQuery = `
     SELECT m.id, m.password_hash, m.salt, m.last_name, m.first_name, s.store_name, s.store_code, m.role 
     FROM managers m
-    JOIN sites s ON m.store_code = s.store_code
+    LEFT JOIN sites s ON m.store_code = s.store_code
     WHERE m.login_id = ?
   `;
   
@@ -40,7 +40,7 @@ export async function handleAuthLogin(
     first_name: string;
     store_name: string;
     store_code: string;
-    role: 'leader' | 'ns_manager' | 'store_manager';
+    role: RoleType;
   }>();
 
   if (!userResult) {

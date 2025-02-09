@@ -1,4 +1,4 @@
-
+import { handleAdminDashboard } from "./admin/dashboard";
 import { handleApprooveEndDashboard, handleApprooveStartDashboard } from "./approve/dashboard";
 import { handleApproveStoreManagerDashboard } from "./approve/storemanagerBoard";
 import { handleAuthLogin } from "./auth/login";
@@ -12,7 +12,6 @@ import { handleGetStores } from "./get-stores";
 export async function handleApi(request: Request, env: Env, ctx: ExecutionContext) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/^\/api/, ""); // "/api" を除去
-  console.log(`🔹 Received API request: ${path}`); // 🔥 リクエストをログに出力
 
   try {
     if (path === "/test" && request.method === "GET") {
@@ -35,26 +34,22 @@ export async function handleApi(request: Request, env: Env, ctx: ExecutionContex
     );
   }
   
-
+  // /api/stores
   if (path === "/stores" && request.method === "GET") {
     return handleGetStores(request, env, ctx)
   }
 
-  if (path === "/beverages") {
-    // If you did not use `DB` as your binding name, change it here
-    const { results } = await env.DB.prepare(
-      "SELECT * FROM Customers WHERE CompanyName = ?",
-    )
-      .bind("Bs Beverages")
-      .all();
-    return Response.json(results);
+  // /api/admin/dashboard
+  if (path.startsWith("/admin/dashboard")) {
+    return handleAdminDashboard(request, env, ctx);
   }
 
-  // /api/approve/dashboard
+  // /api/approve/dashboard-start
   if (path.startsWith("/approve/dashboard-start")) {
     return handleApprooveStartDashboard(request, env, ctx);
   }
-
+  
+  // /api/approve/dashboard-end
   if (path.startsWith("/approve/dashboard-end")) {
     return handleApprooveEndDashboard(request, env, ctx);
   }

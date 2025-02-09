@@ -1,8 +1,24 @@
-import { Form, NavLink } from "@remix-run/react";
+import { Form, Link, NavLink, useLocation, useNavigation } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { LoginResponseType } from "~/lib/types";
 import { cn } from "../lib/utils"
 import { ReactNode } from "react";
+import { Loader2 } from "lucide-react";
+import { Card } from "~/components/ui/card";
+
+export const LoginButton = () => {
+  const location = useLocation();
+  const currentPath = location.pathname + location.search; // クエリパラメータも含める
+
+  return (
+    <Link to={`/login?redirect=${encodeURIComponent(currentPath)}`}>
+      <Button variant="outline" size="sm" className="mx-2">
+        ログイン
+      </Button>
+    </Link>
+  );
+};
+
 
 interface LogoutButtonProps {
   // isLoggedIn: boolean;
@@ -13,7 +29,8 @@ export const LogoutButton = ({
   // isLoggedIn,
   user
  }: LogoutButtonProps) => {
-
+  const location = useLocation();
+  const currentPath = location.pathname + location.search;
   // if (!isLoggedIn) {
   //   return null; // ログインしていない場合は何も表示しない
   // }
@@ -21,13 +38,23 @@ export const LogoutButton = ({
   return (
     <div className="px-2 flex flex-row space-x-2 items-baseline justify-center">
       <p className="mb-2 hidden md:block">こんにちは {user.lastName}さん</p>
-      <Form method="post" action="/logout">
+      <Form method="post" action={`/logout?redirect=${encodeURIComponent(currentPath)}`}>
         <Button type="submit" variant="secondary">
           ログアウト
         </Button>
       </Form>
     </div>
   );
+}
+
+export const AccessDenied = ({ children }: { children: ReactNode }) => {
+  return (
+    <div className="flex items-center justify-center min-h-screen-header bg-gray-50">
+    <Card className="w-full h-40 m-4 flex items-center justify-center">
+      {children}
+    </Card>
+  </div>
+  )
 }
 
 
@@ -40,7 +67,9 @@ interface TabProps {
   children: ReactNode;
 }
 
-export function Tabs({ tabs, children }: TabProps) {
+export const Tabs = ({ tabs, children }: TabProps) => {
+  const navigation = useNavigation();
+  const isNavigating = navigation.state === "loading";
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col">
       <div className="flex space-x-1 rounded-xl bg-muted p-1">
@@ -57,7 +86,17 @@ export function Tabs({ tabs, children }: TabProps) {
               )
             }
           >
-            {tab.label}
+            {({ isPending }) => (
+              <div className="flex items-center justify-center space-x-1">
+                <div className="w-4 h-4"></div>
+                <span>{tab.label}</span>
+                <div className="w-4 h-4 flex items-center justify-center">
+                  {isNavigating && isPending && (
+                    <Loader2 className="animate-spin w-4 h-4" />
+                  )}
+                </div>
+              </div>
+            )}
           </NavLink>
         ))}
       </div>

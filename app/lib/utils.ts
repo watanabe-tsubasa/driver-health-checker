@@ -8,11 +8,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const fetchStores = async (env: Env): Promise<Store[]> => {
-  const { API_BASE_URL } = env;
-  console.log(env)
-  console.log(API_BASE_URL)
   try {
-    const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/stores`);
+    const response = await innerFetch(env, `/api/stores`);
     if (!response.ok) throw new Error("店舗の取得に失敗しました");
     const data: Store[] = await response.json();
     return data
@@ -52,6 +49,8 @@ export const roleTransition = (role: RoleType) => {
       return 'ネットスーパーマネージャー'
     case 'store_manager':
       return '店長'
+    case 'master':
+      return '本社'
     default:
       return '配送リーダー'
   }
@@ -65,18 +64,29 @@ export const convertToJSTDate = (date: Date) => {
   return new Date(date.getTime() + 9 * 60 * 60 * 1000);
 };
 
+export const convertJSTToUTCDate = (date: Date | undefined) => {
+  return date ? new Date(date.getTime() - 9 * 60 * 60 * 1000) : undefined;
+};
+
+export async function requireAuth(request: Request, loginData: LoginResponseType | null) {
+  if (!loginData) {
+    const url = new URL(request.url);
+    return redirect(`/login?redirect=${encodeURIComponent(url.pathname)}`);
+  }
+  return null;
+}
+
 export const commonDashboardLoader = async (
   request: Request<unknown, CfProperties<unknown>>,
   context: AppLoadContext,
   direction: 'start' | 'end'
 ) => {
   const loginData = getLoginDataFromCookie(request);
-  if (!loginData) return redirect("/login");
+  if(!loginData) return requireAuth(request, loginData);
 
   const env = callEnv(context);
-  const { API_BASE_URL } = env;
   const queryParams = new URLSearchParams({ storeCode: loginData.storeCode, role: loginData.role }).toString();
-  const res = await env.API_WORKER.fetch(`${API_BASE_URL}/api/approve/dashboard-${direction}?${queryParams}`);
+  const res = await innerFetch(env, `/api/approve/dashboard-${direction}?${queryParams}`);
   const filteredData = direction === 'start' ? 
     await res.json() as DashboardStartDriverData[] :
     await res.json() as DashboardEndDriverData[];
@@ -99,8 +109,7 @@ export const commonDashboardAciton = async (
   }
 
   const env = callEnv(context);
-  const { API_BASE_URL } = env;
-  const response = await env.API_WORKER.fetch(`${API_BASE_URL}/api/approve/dashboard-${direction}`, {
+  const response = await innerFetch(env, `/api/approve/dashboard-${direction}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ selectedData, managerId, role }),
@@ -112,4 +121,14 @@ export const commonDashboardAciton = async (
   }
 
   return Response.json({ message: "承認が完了しました。" });
+}
+
+export const innerFetch = async (env: Env, input: RequestInfo | URL, init?: RequestInit) => {
+  const { API_BASE_URL, API_WORKER } = env;
+  const isLocal = API_BASE_URL.includes("localhost");
+
+  return isLocal ? 
+    await fetch(`${API_BASE_URL}${input}`, init) : 
+    await API_WORKER.fetch(`${API_BASE_URL}${input}`, init)
+  
 }

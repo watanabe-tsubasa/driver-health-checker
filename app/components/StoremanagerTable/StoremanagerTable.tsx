@@ -18,6 +18,7 @@ import { columns } from "./StoremanagerTable.columns";
 import { DashboardStoreManagerData, LoginResponseType } from "~/lib/types";
 import { StoremanagerTableBottomToolbar } from "./StoremanagerTableBottomToolbar";
 import { StoremanagerTableTopToolbar } from "./StoremanagerTableTopToolbar";
+import { Separator } from "../ui/separator";
 
 export const StoremanagerTable = ({
   allData,
@@ -105,7 +106,7 @@ export const StoremanagerTable = ({
           )}
         </TableBody>
       </Table>
-
+      <Separator />
       <StoremanagerTableBottomToolbar allData={allData} loginData={loginData} table={table} />
     </div>
   );
